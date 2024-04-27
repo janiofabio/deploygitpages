@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy to GitHub Pages</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Deploy no GitHub Pages</h1>
+    <form id="deployForm">
+        <label for="username">Nome de usuário do GitHub:</label>
+        <input type="text" id="username" name="username" required><br>
+        <label for="repository">Nome do repositório:</label>
+        <input type="text" id="repository" name="repository" required><br>
+        <label for="directory">Diretório do projeto:</label>
+        <input type="text" id="directory" name="directory"><br>        
+        <br><br><button type="submit">Deploy</button>
+    </form>
+    <div id="message"></div>
+    <script src="deploy.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deployForm = document.getElementById('deployForm');
+            const messageDiv = document.getElementById('message');
+
+            deployForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(deployForm);
+                const username = formData.get('username');
+                const repository = formData.get('repository');
+                const directory = formData.get('directory');
+
+                try {
+                    const response = await fetch('/deploy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, repository, directory })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        messageDiv.innerText = 'Deploy realizado com sucesso!';
+                    } else {
+                        messageDiv.innerText = `Erro ao implantar: ${data.message}`;
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar o formulário:', error);
+                    messageDiv.innerText = 'Erro ao enviar o formulário.';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
